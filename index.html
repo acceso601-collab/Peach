@@ -2,45 +2,78 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Juego Flash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Peach - Juego Flash</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      overflow: hidden;
-      background-color: #000;
     }
-    html, body, #container {
+    html, body {
       width: 100%;
       height: 100%;
+      background: #000;
       display: flex;
       justify-content: center;
       align-items: center;
+      overflow: hidden;
     }
-    ruffle-embed, ruffle-player {
+    #container {
+      width: 100%;
+      max-width: 400px;        /* Limita el ancho máximo para reducir píxeles */
+      aspect-ratio: 4 / 3;     /* Ajusta esta proporción a la de tu juego (si es 16:9 cámbialo) */
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
+    ruffle-player {
       width: 100% !important;
       height: 100% !important;
+      display: block;
+    }
+    /* Oculta el overlay de "click para activar" (ahorra recursos) */
+    .ruffle-splash {
+      display: none !important;
     }
   </style>
+
+  <!-- CONFIGURACIÓN DE RUFFLE (ANTES DE CARGAR LA BIBLIOTECA) -->
+  <script>
+    window.RufflePlayer = window.RufflePlayer || {};
+    window.RufflePlayer.config = {
+      quality: "low",                // Sin antialiasing ni sombras
+      letterbox: "on",               // No redibuja fondos extra
+      framerate: 24,                // Baja de 60 a 24 FPS (se nota menos lag)
+      unmuteOverlay: "hidden",      // Quita el botón de sonido
+      splashScreen: false,          // Quita la animación de carga
+      preferredRenderer: "canvas",  // Usa Canvas en vez de WebGL (más ligero en móviles)
+      backgroundColor: "#000000",
+      logLevel: "error"            // Solo muestra errores graves (menos proceso)
+    };
+  </script>
+
+  <!-- CARGA RUFFLE -->
   <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
 </head>
 <body>
   <div id="container"></div>
 
   <script>
-    window.RufflePlayer = window.RufflePlayer || {};
-    window.addEventListener("load", (event) => {
+    // Inicializa Ruffle y carga el SWF
+    window.addEventListener("load", () => {
       const ruffle = window.RufflePlayer.newest();
       const player = ruffle.createPlayer();
       const container = document.getElementById("container");
       container.appendChild(player);
+
       player.load({
         url: "juego.swf",
-        allowScriptAccess: true,
+        allowScriptAccess: "always",
         autoplay: "on",
-        unmuteOverlay: "hidden"
+        // No uses unmuteOverlay aquí porque ya lo pusimos en la config global
       });
     });
   </script>
